@@ -4,24 +4,23 @@ import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 import matplotlib.pyplot as plt
 
-# Carregar o arquivo CSV para um DataFrame do pandas
 df = pd.read_csv('carro.csv')
 
-# Definir as variáveis fuzzy
+# variáveis fuzzy
 preco = ctrl.Antecedent(np.arange(df['preco'].min(), df['preco'].max(), 1), 'preco')
 taxa = ctrl.Antecedent(np.arange(df['taxa'].min(), df['taxa'].max(), 1), 'taxa')
 km_por_litro = ctrl.Antecedent(np.arange(df['km/l'].min(), df['km/l'].max(), 1), 'km_por_litro')
 km_rodado = ctrl.Antecedent(np.arange(df['km'].min(), df['km'].max(), 1), 'km_rodado')
 beneficio = ctrl.Consequent(np.arange(0, 11, 1), 'beneficio')
 
-# Definir automaticamente as funções de pertinência
+# funções de pertinência
 preco.automf(number=3, names=['baixo','medio','alto'])
 taxa.automf(number=3, names=['baixo','medio','alto'])
 km_por_litro.automf(number=3, names=['alto','medio','baixo'])
 km_rodado.automf(number=3, names=['baixo','medio','alto'])
 beneficio.automf(number=3, names=['baixo','medio','alto'])
 
-# Definir as regras do sistema de controle
+# regras do sistema de controle
 regras = [
     ctrl.Rule(preco['baixo'] & taxa['baixo'] & km_por_litro['medio'] & km_rodado['alto'], beneficio['medio']),
     ctrl.Rule(preco['baixo'] & taxa['baixo'] & km_por_litro['alto'] & km_rodado['baixo'], beneficio['alto']),
@@ -46,13 +45,12 @@ regras = [
     ctrl.Rule(preco['medio'] & taxa['alto'] & km_por_litro['baixo'] & km_rodado['medio'], beneficio['medio']),
     ctrl.Rule(preco['medio'] & taxa['alto'] & km_por_litro['alto'] & km_rodado['alto'], beneficio['baixo']),
 ]
-# Adicione mais regras conforme necessário
 
-# Criar o sistema de controle e a simulação
+# sistema de controle e a simulação
 recomendacao_compra = ctrl.ControlSystem(regras)
 recomendacao = ctrl.ControlSystemSimulation(recomendacao_compra)
 
-# Definir as entradas e calcular a saída para cada linha do DataFrame
+# entradas e calculo da saída para cada linha do DataFrame
 
 teste = df.iloc[:5, :].copy()
 
@@ -65,7 +63,3 @@ for index, row in teste.iterrows():
     print(recomendacao.output['beneficio'])
     beneficio.view(sim=recomendacao)
     plt.show()
-
-
-# Visualizar a saída para cada linha do DataFrame
-
